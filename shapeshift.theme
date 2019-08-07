@@ -1,0 +1,55 @@
+function git_project_branch() {
+  if [[ $(git_branch) ]]; then
+    [[ "$(git rev-parse --show-toplevel)" =~ '.*/(.*)' ]] && folder=$match[1]
+    colorize "$folder" red false
+    echo -n ':'
+    git_branch
+  fi
+}
+
+function git_prompt_dir_and_arrow() {
+  if [[ $(git_branch) ]]; then
+    echo
+    local gitRootDir="$(git rev-parse --show-toplevel)"
+    local gitRootDir=$gitRootDir:l
+
+    local fullPath="$(pwd)"
+    local fullPath=$fullPath:l
+
+    local relativeDir=${fullPath//$gitRootDir/}
+    if [[ $relativeDir ]]; then
+      colorize "${relativeDir:1} " blue false
+    fi
+  else
+    print -n "$(prompt_dir) "
+  fi
+  prompt_arrow
+}
+
+function git_position_with_fetch() {
+    if [[ -z "$(git_branch)" ]]
+    then
+        return
+    fi
+
+    git fetch &>/dev/null
+    git_position
+}
+
+SHAPESHIFT_DIR_LENGTH=5
+SHAPESHIFT_PROMPT_LEFT_ELEMENTS=(git_project_branch async_git_diffs async_git_position_with_fetch git_prompt_dir_and_arrow)
+SHAPESHIFT_PROMPT_RIGHT_ELEMENTS=()
+SHAPESHIFT_LS_COLORS=(blue magenta green yellow red green green)
+SHAPESHIFT_LS_COLORS_ENABLED=true
+
+SHAPESHIFT_GIT_BRANCH_BOLD=false
+SHAPESHIFT_GIT_AHEAD_BOLD=false
+SHAPESHIFT_GIT_BEHIND_BOLD=false
+SHAPESHIFT_GIT_DETATCHED_BOLD=false
+SHAPESHIFT_GIT_MERGING_BOLD=false
+SHAPESHIFT_GIT_UNTRACKED_BOLD=false
+SHAPESHIFT_GIT_MODIFIED_BOLD=false
+SHAPESHIFT_GIT_STAGED_BOLD=false
+SHAPESHIFT_ARROW_OK_CHAR_BOLD=false
+SHAPESHIFT_ARROW_KO_CHAR_BOLD=false
+SHAPESHIFT_LAST_FOLDER_DIR_BOLD=false
