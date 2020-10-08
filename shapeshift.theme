@@ -1,14 +1,14 @@
 function git_project_branch() {
-  if [[ $(git_branch) ]]; then
-    [[ "$(git rev-parse --show-toplevel)" =~ '.*/(.*)' ]] && folder=$match[1]
-    colorize "$folder" red false
-    echo -n ':'
-    git_branch
-  fi
+  $SHAPESHIFT_IS_GIT_REPO || return 0
+
+  [[ "$(git rev-parse --show-toplevel)" =~ '.*/(.*)' ]] && folder=$match[1]
+  colorize "$folder" red false
+  echo -n ':'
+  git_branch
 }
 
 function git_prompt_dir_and_arrow() {
-  if [[ $(git_branch) ]]; then
+  if [ $SHAPESHIFT_IS_GIT_REPO = true ]; then
     echo
     local gitRootDir="$(git rev-parse --show-toplevel)"
     local gitRootDir=$gitRootDir:l
@@ -27,10 +27,7 @@ function git_prompt_dir_and_arrow() {
 }
 
 function git_position_with_fetch() {
-    if [[ -z "$(git_branch)" ]]
-    then
-        return
-    fi
+    $SHAPESHIFT_IS_GIT_REPO || return 0
 
     git fetch &>/dev/null
     git_position
